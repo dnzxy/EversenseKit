@@ -6,7 +6,7 @@ enum AlarmType {
     case Info
 }
 
-public enum Alarm: UInt8, Codable {
+public enum Alarm: UInt8, Codable, CaseIterable {
     case CriticalFaultAlarm = 0
     case SensorRetiredAlarm = 1
     case EmptyBatteryAlarm = 2
@@ -156,6 +156,47 @@ public enum Alarm: UInt8, Codable {
         self == .SensorRetiredAlarm || self == .SensorGraceAlarm
     }
 
+    var alertIdentifier: Alert.AlertIdentifier {
+        "com.bastiaanv.eversensekit.\(String(describing: self))"
+    }
+
+    var interruptionLevel: Alert.InterruptionLevel {
+        switch self {
+        case .CriticalFaultAlarm,
+             .EmptyBatteryAlarm,
+             .SeriouslyLowAlarm:
+            return .critical
+
+        case .BatteryStatusAlarm,
+             .EarlySensorRetirement,
+             .InvalidClockAlarm,
+             .MSPAlarm,
+             .OneCal,
+             .SensorConnection,
+             .SensorRetiringSoon1Alarm,
+             .SensorRetiringSoon3Alarm,
+             .SensorRetiringSoon4Alarm,
+             .SensorRetiringSoon5Alarm,
+             .SensorRetiringSoon6Alarm,
+             .SensorRetiringSoon7Alarm,
+             .SensorStability,
+             .SensorSyncConfirmedAlarm,
+             .TransmitterEOL330,
+             .TransmitterEOL366,
+             .TransmitterEOL395,
+             .TwoCal,
+             .VibrationCurrentAlarm:
+            return .active
+
+        default:
+            return .timeSensitive
+        }
+    }
+
+    var issuableAlert: IssuableAlert {
+        IssuableAlert(identifier: alertIdentifier, interruptionLevel: interruptionLevel, title: title)
+    }
+
     var alarm: Alert {
         let title = self.title
         let body = description ?? ""
@@ -163,7 +204,7 @@ public enum Alarm: UInt8, Codable {
         return Alert(
             identifier: Alert.Identifier(
                 managerIdentifier: "EversenseKit",
-                alertIdentifier: "com.bastiaanv.eversensekit.\(String(describing: self))"
+                alertIdentifier: alertIdentifier
             ),
             foregroundContent: Alert.Content(
                 title: title,
@@ -175,7 +216,8 @@ public enum Alarm: UInt8, Codable {
                 body: body,
                 acknowledgeActionButtonLabel: String(localized: "OK", comment: "Acknowlegde alarm")
             ),
-            trigger: .immediate
+            trigger: .immediate,
+            interruptionLevel: interruptionLevel
         )
     }
 
