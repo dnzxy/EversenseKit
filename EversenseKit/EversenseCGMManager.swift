@@ -171,8 +171,8 @@ public class EversenseCGMManager: CGMManager {
         stateObservers.removeElement(state)
     }
 
-    public static var issuableAlerts: [IssuableAlert] {
-        Alarm.allCases.filter { $0 != .unknown }.map(\.issuableAlert)
+    public static var alertCatalog: [AlertCatalogEntry] {
+        Alarm.allCases.filter { $0 != .unknown }.map(\.catalogEntry)
     }
 
     public func acknowledgeAlert(alertIdentifier _: LoopKit.Alert.AlertIdentifier) async throws {

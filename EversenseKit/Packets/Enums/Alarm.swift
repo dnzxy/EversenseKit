@@ -193,8 +193,8 @@ public enum Alarm: UInt8, Codable, CaseIterable {
         }
     }
 
-    var issuableAlert: IssuableAlert {
-        IssuableAlert(identifier: alertIdentifier, interruptionLevel: interruptionLevel, title: title)
+    var catalogEntry: AlertCatalogEntry {
+        AlertCatalogEntry(identifier: alertIdentifier, interruptionLevel: interruptionLevel, title: title)
     }
 
     var alarm: Alert {
